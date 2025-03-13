@@ -2,9 +2,10 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function CheckoutSuccessPage() {
+// Create a wrapper component that uses useSearchParams
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const [countdown, setCountdown] = useState(5);
@@ -77,5 +78,26 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Create a loading fallback
+function CheckoutSuccessLoading() {
+  return (
+    <div className="min-h-[600px] flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-gray-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading order details...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main component that uses Suspense
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<CheckoutSuccessLoading />}>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 } 
