@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  role          UserRole
+  phone         String?
+  address       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Farmer specific
+  products      Product[]
+  farmProfile   FarmProfile?
+  
+  // Consumer specific
+  orders        Order[]
+  reviews       Review[]
+  
+  // Supplier specific
+  supplies      Supply[]
+}
+
+enum UserRole {
+  FARMER
+  CONSUMER
+  WHOLESALER
+  SUPPLIER
+  ADMIN
+}
+
+// Sales Platform Models
+model Product {
+  id            String    @id @default(cuid())
+  name          String
+  description   String    @db.Text
+  price         Float
+  quantity      Float
+  unit          String    // kg, dozen, etc.
+  category      String
+  isWholesale   Boolean   @default(false)
+  minOrderQty   Float?
+  images        String    @db.Text // Store as JSON string
+  farmerId      String
+  farmer        User      @relation(fields: [farmerId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  orderItems    OrderItem[]
+  reviews       Review[]
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  buyerId       String
+  buyer         User      @relation(fields: [buyerId], references: [id])
+  status        OrderStatus
+  totalAmount   Float
+  paymentStatus PaymentStatus
+  deliveryAddress String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  orderItems    OrderItem[]
+}
+
+model OrderItem {
+  id          String    @id @default(cuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id])
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id])
+  quantity    Float
+  price       Float
+  createdAt   DateTime  @default(now())
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  rating      Int
+  comment     String?   @db.Text
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+// Farm Monitoring Models
+model FarmProfile {
+  id          String    @id @default(cuid())
+  farmerId    String    @unique
+  farmer      User      @relation(fields: [farmerId], references: [id])
+  location    String
+  farmSize    Float
+  soilType    String?
+  crops       CropMonitoring[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model CropMonitoring {
+  id          String    @id @default(cuid())
+  cropType    String
+  plantingDate DateTime
+  expectedHarvestDate DateTime
+  status      String
+  healthStatus String?
+  notes       String?   @db.Text
+  farmId      String
+  farm        FarmProfile @relation(fields: [farmId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  analyses    CropAnalysis[]
+}
+
+model CropAnalysis {
+  id          String    @id @default(cuid())
+  cropId      String
+  crop        CropMonitoring @relation(fields: [cropId], references: [id])
+  analysisType String    // SOIL, DISEASE, WEATHER, MARKET
+  result      String    @db.Text
+  recommendation String? @db.Text
+  createdAt   DateTime  @default(now())
+}
+
+// Marketplace Models
+model Supply {
+  id          String    @id @default(cuid())
+  name        String
+  description String    @db.Text
+  price       Float
+  category    SupplyCategory
+  stock       Int
+  images      String    @db.Text // Store as JSON string
+  supplierId  String
+  supplier    User      @relation(fields: [supplierId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum SupplyCategory {
+  SEEDS
+  FERTILIZERS
+  PESTICIDES
+  TOOLS
+  EQUIPMENT
+}
