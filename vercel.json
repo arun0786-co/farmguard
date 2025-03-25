@@ -1,9 +1,30 @@
 {
-  "buildCommand": "npx prisma generate && npm run build",
-  "outputDirectory": ".next",
-  "devCommand": "npm run dev",
+  "version": 2,
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_VERCEL_URL": {
+      "type": "string"
+    },
+    "NEXT_PUBLIC_SUPABASE_URL": {
+      "type": "string"
+    },
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": {
+      "type": "string"
+    },
+    "NEXTAUTH_URL": {
+      "type": "string"
+    },
+    "NEXTAUTH_SECRET": {
+      "type": "string"
+    },
+    "NEXT_PUBLIC_API_URL": {
+      "type": "string"
+    }
+  },
+  "devCommand": "npm run dev",
   "regions": ["sin1"],
   "images": {
     "sizes": [640, 750, 828, 1080, 1200, 1920],
