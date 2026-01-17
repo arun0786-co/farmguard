@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌾 KrishiMitra - AI Farming Advisor
 
-## Getting Started
+An intelligent farming companion that provides expert advice on crop selection, disease diagnosis, and soil health analysis. Built with Next.js, React, and Tailwind CSS.
 
-First, run the development server:
+## ✨ Features
+
+- **🌱 Plant Disease Diagnosis** - Upload plant photos for instant disease identification (15+ diseases)
+- **🧪 Soil Analysis** - Upload soil reports (PDF/Image) for comprehensive NPK analysis
+- **🌾 Crop Recommendations** - Get personalized crop suggestions based on season, soil, and water
+- **💰 Market Prices** - Real-time crop price tracking and trends
+- **🌤️ Weather Advice** - Season-specific farming guidance
+- **🐛 Pest Control** - Pest identification and treatment recommendations
+- **🏛️ Government Schemes** - Information on subsidies and benefits
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+farmguard/
+├── src/
+│   ├── app/              # Next.js app router pages
+│   ├── components/       # React components
+│   ├── lib/             # Utility functions and AI logic
+│   ├── store/           # State management (Zustand)
+│   └── types/           # TypeScript type definitions
+├── public/              # Static assets
+└── package.json         # Dependencies
+```
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework:** Next.js 16
+- **UI Library:** React 19
+- **Styling:** Tailwind CSS 4
+- **Animations:** Framer Motion
+- **State Management:** Zustand
+- **Icons:** Lucide React
+- **Language:** TypeScript
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📝 Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Landing Page** - Learn about features and click "Start Chatting"
+2. **Chat Interface** - Ask questions or use quick action buttons
+3. **Upload Files** - Upload plant images or soil report PDFs
+4. **Get Recommendations** - Follow the conversation flow for crop advice
 
-## Deploy on Vercel
+## 🌟 Key Capabilities
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **15 Plant Diseases** with detailed treatment plans
+- **14 Crops** across all seasons (Kharif, Rabi, Zaid)
+- **Micronutrient Analysis** (NPK, Zinc, Boron, Sulfur, Iron)
+- **Cost Breakdowns** for fertilizers and treatments
+- **ROI Calculations** for crop profitability
+- **PDF Support** for soil test reports (up to 10MB)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+
+This project is open source and available for educational purposes.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+## 👨‍💻 Developer
+
+Built with 💚 for farmers using modern web technologies.
