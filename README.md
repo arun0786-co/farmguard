@@ -77,14 +77,4 @@ farmguard/
 - **ROI Calculations** for crop profitability
 - **PDF Support** for soil test reports (up to 10MB)
 
-## 📄 License
 
-This project is open source and available for educational purposes.
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-## 👨‍💻 Developer
-
-Built with 💚 for farmers using modern web technologies.
