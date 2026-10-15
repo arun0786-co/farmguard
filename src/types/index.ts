@@ -59,7 +59,7 @@ export interface UserPreferences {
 }
 
 export interface ChatContext {
-    currentFlow?: "diagnosis" | "soil-analysis" | "crop-recommendation";
+    currentFlow?: "diagnosis" | "soil-analysis" | "crop-recommendation" | "weather" | "prices";
     awaitingInput?: string;
     conversationData?: {
         month?: string;

@@ -1,5 +1,4 @@
-import { Disease, SoilReport, MarketPrice } from "@/types";
-import { randomChoice, randomInt, delay, getCurrentSeason } from "./utils";
+import { Disease } from "@/types";
 import { recommendCrops, cropDatabase } from "./crop-database";
 
 // ============================================
@@ -361,313 +360,11 @@ export const pestDatabase = [
 // ENHANCED MOCK AI ANALYSIS FUNCTIONS
 // ============================================
 
-export async function analyzePlantImage(imageFile: File): Promise<{
-    diagnosis: string;
-    disease?: Disease;
-    confidence: number;
-    recommendations: string[];
-}> {
-    // Simulate processing delay
-    await delay(randomInt(2500, 4000));
-
-    // Get current season and time for context
-    const season = getCurrentSeason();
-    const month = new Date().getMonth() + 1;
-    const hour = new Date().getHours();
-
-    // Random disease selection (simulating "AI" detection)
-    const detectedDisease = randomChoice(diseaseDatabase);
-    const confidence = randomInt(78, 96);
-
-    // Generate contextual diagnosis based on season and time
-    const seasonalContext =
-        season === "Kharif"
-            ? "🌧️ **Monsoon Season Alert:** High humidity during monsoon significantly increases fungal disease risk. Regular monitoring is crucial."
-            : season === "Rabi"
-                ? "❄️ **Winter Season Note:** Cool weather conditions detected. Monitor for pest activity and nutrient deficiencies."
-                : "☀️ **Summer Season Warning:** Heat stress detected. Ensure adequate irrigation and watch for pest outbreaks.";
-
-    const timeContext =
-        hour < 12
-            ? "Early morning inspection is ideal for disease detection."
-            : hour < 17
-                ? "Afternoon heat may stress plants - ensure adequate watering."
-                : "Evening inspection complete. Plan treatment for tomorrow morning.";
-
-    // Additional analysis based on file metadata
-    const fileSize = imageFile.size;
-    const imageQuality = fileSize > 1000000 ? "High resolution image - excellent for detailed analysis" : "Image quality sufficient for diagnosis";
-
-    const diagnosis = `
-**🔬 Advanced Image Analysis Complete**
-
-${seasonalContext}
-${timeContext}
-
-**📊 Analysis Results:**
-• **Detected Condition:** ${detectedDisease.name}
-• **Severity Level:** ${detectedDisease.severity} ${detectedDisease.severity === "High" ? "🔴" : detectedDisease.severity === "Medium" ? "🟡" : "🟢"}
-• **Confidence Score:** ${confidence}%
-• **Image Quality:** ${imageQuality}
-• **Affected Crops:** ${detectedDisease.affectedCrops.join(", ")}
-
-**🔍 Observed Symptoms:**
-${detectedDisease.symptoms.map((s, i) => `${i + 1}. ${s}`).join("\n")}
-
-**🧪 Probable Causes:**
-${detectedDisease.causes.map((c, i) => `${i + 1}. ${c}`).join("\n")}
-
-**💊 Immediate Treatment Plan:**
-${detectedDisease.solutions.map((s, i) => `**Step ${i + 1}:** ${s}`).join("\n\n")}
-
-**🛡️ Prevention for Future:**
-${detectedDisease.preventiveMeasures.map((p) => `✓ ${p}`).join("\n")}
-
-**📅 Treatment Timeline:**
-• **Day 1-2:** Remove infected parts, apply first treatment
-• **Day 3-7:** Monitor progress, repeat spray if needed
-• **Day 8-14:** Assess recovery, continue preventive measures
-• **Day 15+:** Maintain regular monitoring
-
-**💰 Estimated Treatment Cost:**
-• Fungicide/Pesticide: ₹${randomInt(200, 800)}/acre
-• Labor: ₹${randomInt(150, 400)}/acre
-• **Total:** ₹${randomInt(350, 1200)}/acre
-
-**⚠️ Critical Warning:**
-${detectedDisease.severity === "High" ? "This is a HIGH severity condition. Immediate action required within 24-48 hours to prevent crop loss!" : detectedDisease.severity === "Medium" ? "Moderate severity - treat within 3-5 days for best results." : "Low severity - monitor and treat as preventive measure."}
-
-💡 **Expert Tip:** Early detection can save up to 80% of potential yield loss. Monitor your crop daily, especially during ${season} season. Consider setting up a weekly inspection schedule.
-
-📞 **Need Help?** Contact your nearest Krishi Vigyan Kendra (KVK) or agricultural extension officer for hands-on guidance.
-  `.trim();
-
-    return {
-        diagnosis,
-        disease: detectedDisease,
-        confidence,
-        recommendations: detectedDisease.solutions,
-    };
-}
-
-export async function analyzeSoilReport(file?: File): Promise<{
-    report: string;
-    soilData: SoilReport;
-}> {
-    await delay(randomInt(2500, 4000));
-
-    // Check if it's a PDF
-    const isPDF = file?.type === "application/pdf";
-
-    // Simulate NPK extraction (random values for demo)
-    const soilData: SoilReport = {
-        nitrogen: randomInt(150, 380),
-        phosphorus: randomInt(15, 85),
-        potassium: randomInt(90, 320),
-        ph: randomInt(52, 82) / 10, // 5.2 to 8.2
-        organicMatter: randomInt(12, 48) / 10, // 1.2% to 4.8%
-        recommendations: [],
-    };
-
-    // Additional micronutrients (simulated)
-    const micronutrients = {
-        sulfur: randomInt(10, 40),
-        zinc: randomInt(0.5, 2.5),
-        boron: randomInt(0.3, 1.5),
-        iron: randomInt(3, 15),
-    };
-
-    // Generate detailed recommendations
-    const recommendations: string[] = [];
-    const fertilizers: string[] = [];
-    let totalCost = 0;
-
-    // Nitrogen analysis
-    if (soilData.nitrogen < 200) {
-        recommendations.push("🔴 Nitrogen is CRITICALLY LOW. Immediate application required.");
-        fertilizers.push("Urea @ 30-35 kg/acre (₹600-700)");
-        totalCost += 650;
-    } else if (soilData.nitrogen < 250) {
-        recommendations.push("🟡 Nitrogen is LOW. Apply before sowing.");
-        fertilizers.push("Urea @ 25-30 kg/acre (₹500-600)");
-        totalCost += 550;
-    } else if (soilData.nitrogen > 320) {
-        recommendations.push("🟢 Nitrogen is HIGH. Avoid additional nitrogen fertilizers to prevent lodging.");
-    } else {
-        recommendations.push("✅ Nitrogen levels are OPTIMAL. Maintain with balanced fertilization.");
-        fertilizers.push("Urea @ 15-20 kg/acre for maintenance (₹300-400)");
-        totalCost += 350;
-    }
-
-    // Phosphorus analysis
-    if (soilData.phosphorus < 25) {
-        recommendations.push("🔴 Phosphorus is VERY LOW. Critical for root development.");
-        fertilizers.push("DAP (Di-Ammonium Phosphate) @ 60-75 kg/acre (₹1800-2200)");
-        totalCost += 2000;
-    } else if (soilData.phosphorus < 40) {
-        recommendations.push("🟡 Phosphorus is LOW. Apply DAP before sowing.");
-        fertilizers.push("DAP @ 50 kg/acre (₹1500)");
-        totalCost += 1500;
-    } else if (soilData.phosphorus > 65) {
-        recommendations.push("🟢 Phosphorus is HIGH. No additional P fertilizer needed this season.");
-    } else {
-        recommendations.push("✅ Phosphorus levels are GOOD. Minimal supplementation needed.");
-        fertilizers.push("SSP (Single Super Phosphate) @ 30 kg/acre (₹400)");
-        totalCost += 400;
-    }
-
-    // Potassium analysis
-    if (soilData.potassium < 120) {
-        recommendations.push("🔴 Potassium is LOW. Essential for fruit/grain quality.");
-        fertilizers.push("Muriate of Potash (MOP) @ 25-30 kg/acre (₹800-1000)");
-        totalCost += 900;
-    } else if (soilData.potassium < 180) {
-        recommendations.push("🟡 Potassium is MODERATE. Apply during flowering stage.");
-        fertilizers.push("MOP @ 20 kg/acre (₹650)");
-        totalCost += 650;
-    } else {
-        recommendations.push("✅ Potassium levels are ADEQUATE. Maintenance dose sufficient.");
-        fertilizers.push("MOP @ 10-15 kg/acre (₹350)");
-        totalCost += 350;
-    }
-
-    // pH analysis
-    if (soilData.ph < 5.5) {
-        recommendations.push("🔴 Soil is HIGHLY ACIDIC. Lime application urgent.");
-        fertilizers.push("Agricultural Lime @ 250-300 kg/acre (₹1200-1500)");
-        totalCost += 1350;
-    } else if (soilData.ph < 6.0) {
-        recommendations.push("🟡 Soil is ACIDIC. Apply lime to raise pH.");
-        fertilizers.push("Agricultural Lime @ 200 kg/acre (₹1000)");
-        totalCost += 1000;
-    } else if (soilData.ph > 8.0) {
-        recommendations.push("🔴 Soil is HIGHLY ALKALINE. Sulfur application needed.");
-        fertilizers.push("Elemental Sulfur @ 60-80 kg/acre (₹800-1000)");
-        totalCost += 900;
-    } else if (soilData.ph > 7.5) {
-        recommendations.push("🟡 Soil is ALKALINE. Add sulfur to lower pH.");
-        fertilizers.push("Elemental Sulfur @ 50 kg/acre (₹650)");
-        totalCost += 650;
-    } else {
-        recommendations.push("✅ Soil pH is OPTIMAL (6.0-7.5) for most crops.");
-    }
-
-    // Organic matter analysis
-    if (soilData.organicMatter < 2.0) {
-        recommendations.push("🔴 Organic matter is CRITICALLY LOW. Soil health at risk.");
-        fertilizers.push("FYM (Farm Yard Manure) @ 6-8 tons/acre (₹3000-4000)");
-        fertilizers.push("Vermicompost @ 2 tons/acre (₹2000)");
-        totalCost += 5000;
-    } else if (soilData.organicMatter < 2.5) {
-        recommendations.push("🟡 Organic matter is LOW. Add compost for soil health.");
-        fertilizers.push("FYM @ 5 tons/acre (₹2500) OR Compost @ 3 tons/acre (₹1800)");
-        totalCost += 2500;
-    } else if (soilData.organicMatter > 4.0) {
-        recommendations.push("🟢 Organic matter content is EXCELLENT. Maintain current practices.");
-    } else {
-        recommendations.push("✅ Organic matter content is HEALTHY (2.5-4.0%).");
-        fertilizers.push("FYM @ 3 tons/acre for maintenance (₹1500)");
-        totalCost += 1500;
-    }
-
-    // Micronutrient recommendations
-    const microRecs: string[] = [];
-    if (micronutrients.zinc < 1.0) {
-        microRecs.push("Zinc Sulfate @ 10 kg/acre (₹400)");
-        totalCost += 400;
-    }
-    if (micronutrients.boron < 0.5) {
-        microRecs.push("Borax @ 5 kg/acre (₹300)");
-        totalCost += 300;
-    }
-    if (micronutrients.sulfur < 15) {
-        microRecs.push("Gypsum @ 100 kg/acre (₹600)");
-        totalCost += 600;
-    }
-
-    soilData.recommendations = recommendations;
-
-    const report = `
-**🧪 Comprehensive Soil Analysis Report**
-${isPDF ? "📄 *PDF Report Analyzed*" : "📷 *Image Report Analyzed*"}
-
-**📊 Primary Nutrients (NPK):**
-• **Nitrogen (N):** ${soilData.nitrogen} ppm ${soilData.nitrogen < 200 ? "🔴 Critical" : soilData.nitrogen < 250 ? "🟡 Low" : soilData.nitrogen > 320 ? "🟢 High" : "✅ Good"}
-• **Phosphorus (P):** ${soilData.phosphorus} ppm ${soilData.phosphorus < 25 ? "🔴 Very Low" : soilData.phosphorus < 40 ? "🟡 Low" : soilData.phosphorus > 65 ? "🟢 High" : "✅ Good"}
-• **Potassium (K):** ${soilData.potassium} ppm ${soilData.potassium < 120 ? "🔴 Low" : soilData.potassium < 180 ? "🟡 Moderate" : "✅ Adequate"}
-
-**🔬 Secondary Nutrients:**
-• **Sulfur (S):** ${micronutrients.sulfur} ppm ${micronutrients.sulfur < 15 ? "🟡 Low" : "✅ Good"}
-• **Calcium (Ca):** ${randomInt(800, 2000)} ppm ✅ Adequate
-• **Magnesium (Mg):** ${randomInt(150, 400)} ppm ✅ Good
-
-**⚗️ Micronutrients:**
-• **Zinc (Zn):** ${micronutrients.zinc.toFixed(1)} ppm ${micronutrients.zinc < 1.0 ? "🟡 Low" : "✅ Good"}
-• **Iron (Fe):** ${micronutrients.iron.toFixed(1)} ppm ✅ Adequate
-• **Boron (B):** ${micronutrients.boron.toFixed(1)} ppm ${micronutrients.boron < 0.5 ? "🟡 Low" : "✅ Good"}
-• **Manganese (Mn):** ${randomInt(5, 20)} ppm ✅ Good
-
-**⚖️ Soil Properties:**
-• **pH Level:** ${soilData.ph.toFixed(1)} ${soilData.ph < 5.5 ? "🔴 Highly Acidic" : soilData.ph < 6.0 ? "🟡 Acidic" : soilData.ph > 8.0 ? "🔴 Highly Alkaline" : soilData.ph > 7.5 ? "🟡 Alkaline" : "✅ Neutral"}
-• **Organic Matter:** ${soilData.organicMatter.toFixed(1)}% ${soilData.organicMatter < 2.0 ? "🔴 Critical" : soilData.organicMatter < 2.5 ? "🟡 Low" : soilData.organicMatter > 4.0 ? "🟢 Excellent" : "✅ Healthy"}
-• **Electrical Conductivity (EC):** ${(randomInt(20, 80) / 100).toFixed(2)} dS/m ${randomInt(20, 80) > 50 ? "⚠️ Slightly Saline" : "✅ Normal"}
-
-**📋 Detailed Recommendations:**
-${recommendations.map((r, i) => `${i + 1}. ${r}`).join("\n")}
-
-**🌾 Fertilizer Application Plan:**
-
-**Phase 1: Pre-Sowing (15 days before sowing)**
-${fertilizers.slice(0, 3).map((f, i) => `${i + 1}. ${f}`).join("\n")}
-
-**Phase 2: At Sowing**
-• Mix all fertilizers thoroughly with soil
-• Apply in furrows or broadcast and incorporate
-
-**Phase 3: Top Dressing**
-• **30 Days After Sowing:** Urea @ 15 kg/acre (₹300)
-• **60 Days After Sowing:** MOP @ 10 kg/acre (₹350) for fruiting crops
-
-${microRecs.length > 0 ? `**Micronutrient Application:**\n${microRecs.map((m, i) => `${i + 1}. ${m}`).join("\n")}` : ""}
-
-**💰 Cost Breakdown:**
-• Primary Fertilizers: ₹${Math.round(totalCost * 0.6)}
-• Organic Amendments: ₹${Math.round(totalCost * 0.3)}
-• Micronutrients: ₹${Math.round(totalCost * 0.1)}
-• **Total Estimated Cost:** ₹${totalCost}/acre
-
-**📅 Application Schedule:**
-• **Week 1:** Soil preparation + lime/sulfur (if needed)
-• **Week 2:** FYM/Compost incorporation
-• **Week 3:** NPK fertilizer application
-• **Week 4:** Sowing + micronutrient spray
-
-**🎯 Expected Outcomes:**
-• Improved soil fertility within 30-45 days
-• Better crop establishment and growth
-• Increased yield potential by 20-30%
-• Enhanced soil health for future crops
-
-**⚠️ Important Notes:**
-• Always conduct soil test every 6 months
-• Adjust fertilizer doses based on crop requirements
-• Maintain soil moisture during fertilizer application
-• Avoid over-application - can harm crops and environment
-
-💡 **Pro Tip:** Split nitrogen application into 3 doses (40% basal + 30% at 30 days + 30% at 60 days) for better efficiency and reduced leaching losses!
-
-📞 **Need Assistance?** Contact your local soil testing laboratory or agricultural extension officer for customized recommendations.
-  `.trim();
-
-    return { report, soilData };
-}
-
 export async function getCropRecommendation(
     month: string,
     waterAvailability: string,
     soilType: string
 ): Promise<string> {
-    await delay(2000);
 
     // Determine season from month
     const monthNum = [
@@ -716,26 +413,17 @@ ${crops.map((crop, i) => {
         return `
 **${i + 1}. ${crop.name}** ${i === 0 ? "⭐ BEST CHOICE" : i === 1 ? "🥈 RUNNER-UP" : ""}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-**Market Economics:**
-• Current Price: ₹${crop.marketPrice}/kg
-• Expected Yield: ${crop.yieldPerAcre} kg/acre
-• Gross Revenue: ₹${rev.revenue.toLocaleString()}/acre
-• Estimated Profit: ₹${Math.round(rev.profit).toLocaleString()}/acre
-• Profit Margin: ~${crop.profitMargin}%
+**Rough Economics (average numbers, not live):**
+• Reference Price: about ₹${crop.marketPrice}/kg
+• Typical Yield: ${crop.yieldPerAcre} kg/acre
+• Gross Revenue: about ₹${rev.revenue.toLocaleString()}/acre
+• Rough Profit: about ₹${Math.round(rev.profit).toLocaleString()}/acre (~${crop.profitMargin}% margin)
 
 **Crop Requirements:**
 • Duration: ${crop.duration} days (${Math.round(crop.duration / 30)} months)
 • Water Need: ${crop.waterRequirement}
 • Suitable Soil: ${crop.soilTypes.join(", ")}
 
-**Investment Breakdown:**
-• Seeds: ₹${randomInt(800, 2000)}/acre
-• Fertilizers: ₹${randomInt(2000, 4000)}/acre
-• Pesticides: ₹${randomInt(500, 1500)}/acre
-• Labor: ₹${randomInt(3000, 6000)}/acre
-• **Total Cost:** ₹${randomInt(6300, 13500)}/acre
-
-**ROI:** ${Math.round((rev.profit / randomInt(6300, 13500)) * 100)}% return on investment
 `;
     }).join("\n")}
 
@@ -743,13 +431,8 @@ ${crops.map((crop, i) => {
 ✓ **Seasonal Match:** Perfect for ${season} season (${month} sowing window)
 ✓ **Soil Compatibility:** Thrives in your ${soilType} soil type
 ✓ **Water Efficiency:** Matches your ${waterAvailability} water availability
-✓ **Market Demand:** High demand with stable prices
-✓ **Profit Potential:** Above-average profit margins (${crops[0].profitMargin}%+)
 
-**📊 Market Trend Analysis:**
-• **${crops[0].name}:** ${randomChoice(["Prices rising due to high demand", "Stable prices with good demand", "Export opportunities available"])}
-• **Best Selling Period:** ${season === "Kharif" ? "October-November" : season === "Rabi" ? "April-May" : "June-July"}
-• **Storage Potential:** ${randomChoice(["Can be stored for 3-6 months", "Sell immediately for best prices", "Cold storage recommended"])}
+💡 Prices and profit above are rough averages. Check today's mandi price (ask me "price of ${crops[0].name}") before you decide.
 
 **🌱 Cultivation Timeline:**
 
@@ -775,11 +458,11 @@ ${crops.map((crop, i) => {
 
 **⚠️ Risk Factors & Mitigation:**
 • **Weather Risk:** ${season === "Kharif" ? "Excess rainfall - ensure drainage" : season === "Rabi" ? "Frost damage - use protective measures" : "Heat stress - increase irrigation"}
-• **Pest Risk:** ${randomChoice(["Moderate - regular monitoring needed", "Low - minimal pest pressure", "High - preventive sprays recommended"])}
+• **Pest Risk:** Check the crop every week. If you see something, tell me the signs and I'll help
 • **Market Risk:** Diversify by planting 2-3 crops to spread risk
 
 **💡 Expert Recommendations:**
-1. **Seed Selection:** Use certified seeds from authorized dealers (₹${randomInt(800, 2000)}/acre)
+1. **Seed Selection:** Use certified seeds from authorized dealers
 2. **Soil Preparation:** Deep plowing + FYM @ 5 tons/acre
 3. **Irrigation:** ${waterLevel === "High" ? "Drip system for water efficiency" : waterLevel === "Low" ? "Mulching to conserve moisture" : "Sprinkler or furrow irrigation"}
 4. **Fertilizer:** Soil test-based application (NPK ratio varies by crop)
@@ -817,84 +500,8 @@ ${crops.slice(0, 3).map((c, i) => `${i + 1}. ${c.name}: ₹${Math.round((c.yield
     return response;
 }
 
-export function getMarketPrices(): MarketPrice[] {
-    return cropDatabase.map((crop) => ({
-        crop: crop.name,
-        price: crop.marketPrice + randomInt(-3, 5),
-        unit: "kg",
-        trend: randomChoice(["up", "down", "stable"] as const),
-        change: randomInt(-10, 15),
-        lastUpdated: new Date(),
-    }));
-}
-
-export function getWeatherAdvice(): string {
-    const season = getCurrentSeason();
-    const temp = randomInt(20, 38);
-    const rainfall = randomInt(0, 80);
-    const humidity = randomInt(40, 85);
-
-    const advice = [
-        `**🌤️ ${season} Season Weather Advisory**`,
-        "",
-        "**📊 7-Day Forecast:**",
-        `• Temperature: ${temp}°C - ${temp + 5}°C ${temp > 35 ? "🔥 Heat Wave Alert" : temp < 15 ? "❄️ Cold Wave" : ""}`,
-        `• Rainfall: ${rainfall}mm expected ${rainfall > 50 ? "🌧️ Heavy Rain Alert" : rainfall > 20 ? "🌦️ Moderate Rain" : "☀️ Dry Weather"}`,
-        `• Humidity: ${humidity}% ${humidity > 70 ? "💧 High Humidity" : ""}`,
-        `• Wind Speed: ${randomInt(5, 25)} km/h`,
-        "",
-        "**🌾 Recommended Farming Activities:**",
-    ];
-
-    if (season === "Kharif") {
-        advice.push(
-            "• ✅ Monitor for fungal diseases due to high humidity",
-            "• ✅ Ensure proper drainage in fields - create channels",
-            "• ✅ Apply fungicides preventively (Mancozeb, Copper Oxychloride)",
-            "• ⚠️ Postpone fertilizer application if heavy rain expected",
-            "• ✅ Check for pest outbreaks after rain stops"
-        );
-    } else if (season === "Rabi") {
-        advice.push(
-            "• ✅ Irrigation critical - no natural rainfall expected",
-            "• ✅ Watch for aphid and whitefly attacks in warm weather",
-            "• ✅ Apply fertilizers as per schedule (split doses)",
-            "• ⚠️ Protect crops from frost if temperature drops below 10°C",
-            "• ✅ Harvest mature crops before unexpected rain"
-        );
-    } else {
-        advice.push(
-            "• ✅ Increase irrigation frequency due to heat (every 3-4 days)",
-            "• ✅ Mulch to conserve soil moisture and reduce evaporation",
-            "• ✅ Harvest early morning (6-9 AM) to avoid heat stress",
-            "• ⚠️ Watch for heat stress symptoms - wilting, leaf burn",
-            "• ✅ Provide shade nets for sensitive crops"
-        );
-    }
-
-    advice.push(
-        "",
-        "**💡 Pro Tips:**",
-        `• Best time for spraying: ${randomChoice(["Early morning (6-8 AM)", "Late evening (5-7 PM)"])}`,
-        `• Avoid irrigation during peak heat (12-3 PM)`,
-        `• Monitor soil moisture - water only when top 2 inches are dry`,
-    );
-
-    return advice.join("\n");
-}
-
 export function getQuickResponse(userMessage: string): string {
     const msg = userMessage.toLowerCase();
-
-    if (msg.includes("price") || msg.includes("market")) {
-        const randomCrop = randomChoice(cropDatabase);
-        const trend = randomChoice(["rising ↗️", "stable →", "slightly down ↘️"]);
-        return `**💰 Market Update**\n\nCurrent price for **${randomCrop.name}**: ₹${randomCrop.marketPrice}/kg\n\n• Trend: ${trend}\n• Weekly Change: ${randomChoice(["+5%", "+3%", "-2%", "0%"])}\n• Demand: ${randomChoice(["High", "Moderate", "Good"])}\n\nWould you like detailed market analysis for specific crops?`;
-    }
-
-    if (msg.includes("weather")) {
-        return getWeatherAdvice();
-    }
 
     if (msg.includes("fertilizer") || msg.includes("npk")) {
         return "**🌱 Fertilizer Recommendation**\n\nFor most crops, I recommend:\n\n**Basal Application (at sowing):**\n• NPK 20:20:20 @ 50kg/acre\n• FYM @ 5 tons/acre\n\n**Top Dressing:**\n• Urea @ 25kg/acre (30 days after sowing)\n• MOP @ 15kg/acre (60 days after sowing)\n\n💡 For precise recommendations, upload your soil test report or let me analyze it!";
@@ -905,8 +512,8 @@ export function getQuickResponse(userMessage: string): string {
     }
 
     if (msg.includes("pest") || msg.includes("insect")) {
-        const pest = randomChoice(pestDatabase);
-        return `**🐛 Pest Alert**\n\nCommon pests this season:\n\n**${pest.name}**\n${pest.description}\n\n**Control Measures:**\n${pest.control}\n\n**Immediate Action:**\n1. Spray neem oil @ 5ml/liter\n2. Install sticky traps (yellow for whiteflies, blue for thrips)\n3. If severe, use recommended insecticide\n\nCan you upload a photo for specific pest identification?`;
+        const list = pestDatabase.map((p) => `**${p.name}:** ${p.description}\n   control: ${p.control}`).join("\n");
+        return `**🐛 Common pests**\n\n${list}\n\n**First try:** neem oil 5 ml per litre, yellow sticky traps for whiteflies, blue for thrips.\n\nNot sure what it is? Type **diagnose** and tell me what you see on the plant.`;
     }
 
     if (msg.includes("subsidy") || msg.includes("scheme")) {
@@ -914,5 +521,5 @@ export function getQuickResponse(userMessage: string): string {
     }
 
     // Default response
-    return `**🌾 Welcome to KrishiMitra!**\n\nI can help you with:\n\n• 🌱 **Plant disease diagnosis** - Upload photo for instant analysis\n• 🧪 **Soil analysis** - Upload soil report (PDF/Image) for fertilizer recommendations\n• 🌾 **Crop recommendations** - Based on season, soil, and water\n• 💰 **Market prices** - Real-time crop price updates\n• 🌤️ **Weather advice** - Season-specific farming tips\n• 🐛 **Pest identification** - Upload photo for treatment plan\n• 💧 **Irrigation scheduling** - Crop-specific water management\n• 🏛️ **Government schemes** - Subsidy and benefit information\n\n**What would you like to know?**`;
+    return `**🌾 Welcome to KrishiMitra!**\n\nI can help you with:\n\n• 🌱 **Plant problems** - tell me what you see, I match it with common diseases and pests\n• 🧪 **Soil report** - upload your Soil Health Card PDF or type the values\n• 🌾 **Crop advice** - based on month, water and soil\n• 💰 **Mandi prices** - ask "price of tomato in kerala"\n• 🌤️ **Weather** - ask "weather in thrissur" for a 5 day forecast + farm tips\n• 💧 **Irrigation** and 🏛️ **government schemes**\n\n**What would you like to know?**`;
 }

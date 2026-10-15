@@ -5,160 +5,72 @@ import { useChatStore } from "@/store/chat-state";
 import { Message } from "./Message";
 import { TypingIndicator } from "./TypingIndicator";
 import { QuickActions } from "./ActionButtons";
-import { Send, Image as ImageIcon, Mic } from "lucide-react";
+import { Send, Image as ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import {
-    analyzePlantImage,
-    analyzeSoilReport,
-    getCropRecommendation,
-    getQuickResponse,
-} from "@/lib/ai-engine";
+import { make_reply } from "@/lib/reply";
 
 export function ChatWindow() {
     const { messages, isTyping, addMessage, setTyping, context, updateContext } = useChatStore();
-    const [input, setInput] = useState("");
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [input, set_input] = useState("");
+    const [picked_file, set_picked_file] = useState<File | null>(null);
+    const end_ref = useRef<HTMLDivElement>(null);
+    const file_ref = useRef<HTMLInputElement>(null);
 
-    // Auto-scroll to bottom
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        end_ref.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isTyping]);
 
-    const handleSendMessage = async () => {
-        if (!input.trim() && !selectedFile) return;
+    const handle_send = async () => {
+        if (isTyping || (!input.trim() && !picked_file)) return;
+        const text = input.trim();
+        const file = picked_file;
+        const is_pdf = file?.type === "application/pdf";
 
-        const userMessage = input.trim();
-        const file = selectedFile;
-
-        // Add user message
-        const isPDF = file?.type === "application/pdf";
         addMessage({
             role: "user",
-            content: userMessage || (isPDF ? "📄 [PDF uploaded]" : "📷 [Image uploaded]"),
-            imageUrl: file && !isPDF ? URL.createObjectURL(file) : undefined,
+            content: text || (is_pdf ? "📄 [Soil report uploaded]" : "📷 [Photo uploaded]"),
+            imageUrl: file && !is_pdf ? URL.createObjectURL(file) : undefined,
         });
-
-        setInput("");
-        setSelectedFile(null);
+        set_input("");
+        set_picked_file(null);
         setTyping(true);
 
         try {
-            let botResponse = "";
-
-            // Check if user wants plant diagnosis
-            if (
-                file &&
-                (userMessage.toLowerCase().includes("diagnose") ||
-                    userMessage.toLowerCase().includes("disease") ||
-                    userMessage.toLowerCase().includes("plant") ||
-                    !userMessage)
-            ) {
-                const result = await analyzePlantImage(file);
-                botResponse = result.diagnosis;
-            }
-            // Check if user wants soil analysis
-            else if (
-                file &&
-                (userMessage.toLowerCase().includes("soil") ||
-                    userMessage.toLowerCase().includes("fertilizer") ||
-                    userMessage.toLowerCase().includes("npk"))
-            ) {
-                const result = await analyzeSoilReport(file);
-                botResponse = result.report;
-            }
-            // Check if in crop recommendation flow
-            else if (
-                userMessage.toLowerCase().includes("crop") ||
-                userMessage.toLowerCase().includes("plant") ||
-                userMessage.toLowerCase().includes("sow")
-            ) {
-                // Start crop recommendation flow
-                if (!context.currentFlow) {
-                    updateContext({
-                        currentFlow: "crop-recommendation",
-                        awaitingInput: "month",
-                    });
-                    botResponse =
-                        "I'll help you choose the perfect crop! 🌾\n\n**First, which month are you planning to sow?**\n\nFor example: November, March, July, etc.";
-                }
-            }
-            // Handle crop recommendation flow responses
-            else if (context.currentFlow === "crop-recommendation") {
-                if (context.awaitingInput === "month") {
-                    updateContext({
-                        conversationData: { ...context.conversationData, month: userMessage },
-                        awaitingInput: "water",
-                    });
-                    botResponse = `Great! ${userMessage} is a good time.\n\n**How much water is available for irrigation?**\n\nOptions: High, Medium, or Low`;
-                } else if (context.awaitingInput === "water") {
-                    updateContext({
-                        conversationData: { ...context.conversationData, waterAvailability: userMessage },
-                        awaitingInput: "soil",
-                    });
-                    botResponse = `Perfect! ${userMessage} water availability noted.\n\n**What's your soil type?**\n\nFor example: Black soil, Red soil, Loamy, Sandy, Clay, etc.`;
-                } else if (context.awaitingInput === "soil") {
-                    const { month, waterAvailability } = context.conversationData || {};
-                    if (month && waterAvailability) {
-                        botResponse = await getCropRecommendation(month, waterAvailability, userMessage);
-                        updateContext({ currentFlow: undefined, awaitingInput: undefined, conversationData: {} });
-                    }
-                }
-            }
-            // Default: use quick response
-            else {
-                botResponse = getQuickResponse(userMessage);
-            }
-
-            addMessage({
-                role: "bot",
-                content: botResponse,
-            });
+            const answer = await make_reply(text, file, context);
+            updateContext(answer.ctx);
+            addMessage({ role: "bot", content: answer.text });
         } catch (error) {
-            console.error("Error processing message:", error);
-            addMessage({
-                role: "bot",
-                content: "Sorry, I encountered an error. Please try again.",
-            });
+            console.error("reply failed:", error);
+            addMessage({ role: "bot", content: "Sorry, something went wrong. Please try again." });
         } finally {
             setTyping(false);
         }
     };
 
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handle_file = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+        e.target.value = "";
         if (!file) return;
-
-        // Validate file type - accept images and PDFs
-        const isImage = file.type.startsWith("image/");
-        const isPDF = file.type === "application/pdf";
-
-        if (!isImage && !isPDF) {
-            toast.error("Please upload an image (JPG, PNG) or PDF file");
+        const is_image = file.type.startsWith("image/");
+        const is_pdf = file.type === "application/pdf";
+        if (!is_image && !is_pdf) {
+            toast.error("Please upload a photo (JPG, PNG) or a soil report PDF");
             return;
         }
-
-        // Validate file size (10MB max for PDF, 5MB for images)
-        const maxSize = isPDF ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
-        if (file.size > maxSize) {
-            toast.error(`File too large! Maximum size is ${isPDF ? "10MB" : "5MB"}.`);
+        const max = is_pdf ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+        if (file.size > max) {
+            toast.error(`File too large! Maximum size is ${is_pdf ? "10MB" : "5MB"}.`);
             return;
         }
-
-        setSelectedFile(file);
-        toast.success(`${isPDF ? "PDF" : "Image"} selected! Add a message or send directly.`);
+        set_picked_file(file);
+        toast.success(`${is_pdf ? "Soil report" : "Photo"} added. Press send.`);
     };
 
-    const handleQuickAction = (prompt: string) => {
-        setInput(prompt);
-    };
-
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    const handle_key = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            handleSendMessage();
+            handle_send();
         }
     };
 
@@ -170,28 +82,28 @@ export function ChatWindow() {
                     <Message key={message.id} message={message} />
                 ))}
                 {isTyping && <TypingIndicator />}
-                <div ref={messagesEndRef} />
+                <div ref={end_ref} />
             </div>
 
             {/* Quick Actions */}
             {messages.length <= 1 && (
                 <div className="px-4">
-                    <QuickActions onActionClick={handleQuickAction} />
+                    <QuickActions onActionClick={set_input} />
                 </div>
             )}
 
             {/* Input Area */}
             <div className="border-t border-border bg-card/50 backdrop-blur-sm p-4">
-                {selectedFile && (
+                {picked_file && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-3 flex items-center gap-2 glass rounded-lg px-3 py-2"
                     >
                         <ImageIcon className="w-4 h-4 text-primary" />
-                        <span className="text-sm flex-1 truncate">{selectedFile.name}</span>
+                        <span className="text-sm flex-1 truncate">{picked_file.name}</span>
                         <button
-                            onClick={() => setSelectedFile(null)}
+                            onClick={() => set_picked_file(null)}
                             className="text-xs text-muted-foreground hover:text-foreground"
                         >
                             Remove
@@ -202,14 +114,14 @@ export function ChatWindow() {
                 <div className="flex gap-2">
                     <input
                         type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileSelect}
+                        ref={file_ref}
+                        onChange={handle_file}
                         accept="image/*,application/pdf"
                         className="hidden"
                     />
 
                     <button
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => file_ref.current?.click()}
                         className="glass hover:bg-primary/10 transition-colors rounded-xl px-3 py-2 flex items-center justify-center"
                         title="Upload image or PDF"
                     >
@@ -218,8 +130,8 @@ export function ChatWindow() {
 
                     <textarea
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyPress}
+                        onChange={(e) => set_input(e.target.value)}
+                        onKeyDown={handle_key}
                         placeholder="Ask me anything about farming..."
                         className="flex-1 glass rounded-xl px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                         rows={1}
@@ -230,8 +142,8 @@ export function ChatWindow() {
                     />
 
                     <button
-                        onClick={handleSendMessage}
-                        disabled={!input.trim() && !selectedFile}
+                        onClick={handle_send}
+                        disabled={!input.trim() && !picked_file}
                         className="bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2 flex items-center justify-center transition-all"
                     >
                         <Send className="w-5 h-5" />
