@@ -10,6 +10,16 @@ interface MessageProps {
     message: MessageType;
 }
 
+// **bold**, _small note_ and `code` inside a line
+function inline(line: string) {
+    return line.split(/(\*\*[^*]+\*\*|_[^_\s][^_]*_|`[^`]+`)/g).map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
+        if (part.startsWith("`") && part.endsWith("`")) return <code key={i} className="px-1 rounded bg-black/5">{part.slice(1, -1)}</code>;
+        if (part.length > 2 && part.startsWith("_") && part.endsWith("_")) return <em key={i} className="text-muted-foreground">{part.slice(1, -1)}</em>;
+        return part;
+    });
+}
+
 export function Message({ message }: MessageProps) {
     const isBot = message.role === "bot";
 
@@ -51,37 +61,12 @@ export function Message({ message }: MessageProps) {
                     )}
                     <div className="prose prose-sm max-w-none">
                         {message.content.split("\n").map((line, i) => {
-                            // Handle bold text
-                            if (line.startsWith("**") && line.endsWith("**")) {
-                                return (
-                                    <p key={i} className="font-bold mb-1">
-                                        {line.replace(/\*\*/g, "")}
-                                    </p>
-                                );
-                            }
-                            // Handle bullet points
-                            if (line.startsWith("•")) {
-                                return (
-                                    <p key={i} className="ml-2 mb-1">
-                                        {line}
-                                    </p>
-                                );
-                            }
-                            // Handle numbered lists
-                            if (/^\d+\./.test(line)) {
-                                return (
-                                    <p key={i} className="ml-2 mb-1">
-                                        {line}
-                                    </p>
-                                );
-                            }
-                            // Regular text
-                            return line ? (
-                                <p key={i} className="mb-1">
-                                    {line}
+                            if (!line.trim()) return <br key={i} />;
+                            const list = line.startsWith("•") || /^\d+\./.test(line);
+                            return (
+                                <p key={i} className={list ? "ml-2 mb-1" : "mb-1"}>
+                                    {inline(line)}
                                 </p>
-                            ) : (
-                                <br key={i} />
                             );
                         })}
                     </div>
