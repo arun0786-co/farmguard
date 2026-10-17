@@ -23,7 +23,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold gradient-text font-display">KrishiMitra</h1>
-                <p className="text-xs text-muted-foreground">AI Farming Advisor</p>
+                <p className="text-xs text-muted-foreground">Farming Advisor</p>
               </div>
             </button>
           </div>
@@ -56,7 +56,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-xl font-bold gradient-text font-display">KrishiMitra</h1>
-              <p className="text-xs text-muted-foreground">AI Farming Advisor</p>
+              <p className="text-xs text-muted-foreground">Farming Advisor</p>
             </div>
           </div>
           <button
@@ -78,7 +78,7 @@ export default function Home() {
           >
             <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              <span>Powered by Advanced AI Logic</span>
+              <span>Simple, honest farming help</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-6 font-display">
@@ -88,8 +88,8 @@ export default function Home() {
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Get instant expert advice on crop selection, disease diagnosis, and soil health.
-              Powered by AI to help you grow smarter.
+              Clear advice on crop selection, plant problems, soil health, weather and mandi prices.
+              Free, and it works on any phone.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -136,12 +136,12 @@ export default function Home() {
             </div>
             <h3 className="text-2xl font-bold mb-3">Plant Diagnosis</h3>
             <p className="text-muted-foreground mb-4">
-              Upload a photo and get instant disease identification with treatment recommendations from our database of 8+ common conditions.
+              Tell us what you see on the plant and get the likely problem and treatment, from a list of 15 common diseases and pests.
             </p>
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                <span>Instant disease detection</span>
+                <span>Simple symptom checker</span>
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -176,11 +176,11 @@ export default function Home() {
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span>Market price insights</span>
+                <span>Mandi price check</span>
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <span>Profit margin analysis</span>
+                <span>Rough profit estimate</span>
               </li>
             </ul>
           </motion.div>
@@ -203,7 +203,7 @@ export default function Home() {
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                <span>NPK value analysis</span>
+                <span>Reads your Soil Health Card PDF</span>
               </li>
               <li className="flex items-start gap-2 text-sm">
                 <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
@@ -231,7 +231,7 @@ export default function Home() {
             Ready to Transform Your Farming?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of farmers using AI-powered insights to increase yields and profits
+            Free to use. Ask in simple words, get simple answers.
           </p>
           <button
             onClick={() => setShowChat(true)}
@@ -247,7 +247,7 @@ export default function Home() {
       <footer className="border-t border-border bg-white/50 backdrop-blur-sm py-8">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
           <p className="text-sm">
-            Made with 💚 for farmers • Powered by intelligent mock AI logic
+            Made with 💚 for farmers • always check with your local KVK before using chemicals
           </p>
           <p className="text-xs mt-2">
             © 2026 KrishiMitra. All rights reserved.

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sprout, FlaskConical, Wheat, TrendingUp, Bug, Droplets } from "lucide-react";
+import { Sprout, FlaskConical, Wheat, TrendingUp, CloudSun, Droplets } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface QuickAction {
@@ -14,15 +14,15 @@ interface QuickAction {
 const quickActions: QuickAction[] = [
     {
         id: "diagnose",
-        label: "Diagnose Plant",
+        label: "Plant Problem",
         icon: <Sprout className="w-4 h-4" />,
-        prompt: "I want to diagnose a plant disease. Let me upload a photo.",
+        prompt: "My plant looks sick, help me find the problem.",
     },
     {
         id: "soil",
         label: "Soil Analysis",
         icon: <FlaskConical className="w-4 h-4" />,
-        prompt: "I need soil analysis and fertilizer recommendations.",
+        prompt: "I want to check my soil report and fertilizer.",
     },
     {
         id: "crop",
@@ -32,15 +32,15 @@ const quickActions: QuickAction[] = [
     },
     {
         id: "market",
-        label: "Market Prices",
+        label: "Mandi Prices",
         icon: <TrendingUp className="w-4 h-4" />,
-        prompt: "Show me current market prices for crops.",
+        prompt: "price of onion in maharashtra",
     },
     {
-        id: "pest",
-        label: "Pest Control",
-        icon: <Bug className="w-4 h-4" />,
-        prompt: "I'm facing pest problems. How can I control them?",
+        id: "weather",
+        label: "Weather",
+        icon: <CloudSun className="w-4 h-4" />,
+        prompt: "weather in ",
     },
     {
         id: "irrigation",

@@ -16,15 +16,14 @@ export const useChatStore = create<ChatStore>((set) => ({
         {
             id: "welcome",
             role: "bot",
-            content: `🌾 **Namaste! I'm KrishiMitra, your AI farming advisor.**
+            content: `🌾 **Namaste! I'm KrishiMitra, your farming helper.**
 
 I can help you with:
-• 🌱 Plant disease diagnosis
-• 🧪 Soil analysis & fertilizer recommendations
+• 🌱 Plant problems (tell me what you see)
+• 🧪 Soil Health Card reading & fertilizer advice
 • 🌾 Crop selection based on season & soil
-• 💰 Market prices & trends
-• 🌤️ Weather-based farming advice
-• 🐛 Pest identification & treatment
+• 💰 Mandi prices
+• 🌤️ 5 day weather + farm tips
 
 How can I assist you today?`,
             timestamp: new Date(),

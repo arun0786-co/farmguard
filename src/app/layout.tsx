@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "KrishiMitra - AI Farming Advisor",
+  title: "KrishiMitra - Farming Advisor",
   description: "Your intelligent farming companion for crop recommendations, disease diagnosis, and agricultural guidance",
-  keywords: ["farming", "agriculture", "AI", "crop recommendation", "plant disease", "soil analysis"],
+  keywords: ["farming", "agriculture", "crop recommendation", "plant disease", "soil analysis"],
 };
 
 export default function RootLayout({
