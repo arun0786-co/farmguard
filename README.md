@@ -1,80 +1,61 @@
-# 🌾 KrishiMitra - AI Farming Advisor
+# KrishiMitra (farmguard)
 
-An intelligent farming companion that provides expert advice on crop selection, disease diagnosis, and soil health analysis. Built with Next.js, React, and Tailwind CSS.
+a simple farming helper you can chat with. made for farmers in india.
 
-## ✨ Features
+## what it can do
 
-- **🌱 Plant Disease Diagnosis** - Upload plant photos for instant disease identification (15+ diseases)
-- **🧪 Soil Analysis** - Upload soil reports (PDF/Image) for comprehensive NPK analysis
-- **🌾 Crop Recommendations** - Get personalized crop suggestions based on season, soil, and water
-- **💰 Market Prices** - Real-time crop price tracking and trends
-- **🌤️ Weather Advice** - Season-specific farming guidance
-- **🐛 Pest Control** - Pest identification and treatment recommendations
-- **🏛️ Government Schemes** - Information on subsidies and benefits
+- **plant problems** - you tell it what you see on the plant (white powder, holes in fruit, sticky leaves...) and it matches that with 15 common diseases and pests. gives treatment and how to stop it next time.
+- **soil report** - upload your Soil Health Card PDF (or type the values like `pH 6.8, N 240, P 18, K 150`). it reads the numbers, says what is low or high and what to do.
+- **weather** - ask "weather in thrissur". real 5 day forecast from open-meteo + tips like "rain tomorrow, dont spray today".
+- **mandi prices** - ask "price of onion in maharashtra". live prices from data.gov.in if you add a key (see below), else it shows rough reference prices and says clearly they are not live.
+- **crop advice** - asks month, water and soil type, then suggests crops.
 
-## 🚀 Getting Started
+## what it can NOT do (yet)
 
-### Prerequisites
+- it can't find diseases from a photo. an older version said it could but it was just picking a random disease, which is dangerous for a farmer (wrong medicine). now it asks what you see instead. a real photo model is on the todo list.
+- scanned soil cards (just a photo in a pdf) can't be read, you have to type the values.
+- it is not a replacement for your local KVK or agriculture officer. every diagnosis tells you to confirm before using chemicals.
 
-- Node.js 18+ installed
-- npm or yarn package manager
+## run it
 
-### Installation
-
-```bash
-# Install dependencies
+```
 npm install
-
-# Run development server
 npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+open http://localhost:3000
 
-## 📁 Project Structure
+## live mandi prices (optional)
+
+1. make a free account on data.gov.in and copy your API key
+2. make a file `.env.local` with:
 
 ```
-farmguard/
-├── src/
-│   ├── app/              # Next.js app router pages
-│   ├── components/       # React components
-│   ├── lib/             # Utility functions and AI logic
-│   ├── store/           # State management (Zustand)
-│   └── types/           # TypeScript type definitions
-├── public/              # Static assets
-└── package.json         # Dependencies
+DATA_GOV_KEY=your key here
 ```
 
-## 🛠️ Tech Stack
+note: i could not test the live price api from my laptop (data.gov.in was not reachable), so check it once with your key.
 
-- **Framework:** Next.js 16
-- **UI Library:** React 19
-- **Styling:** Tailwind CSS 4
-- **Animations:** Framer Motion
-- **State Management:** Zustand
-- **Icons:** Lucide React
-- **Language:** TypeScript
+## tests
 
-## 📝 Usage
+```
+npm test
+```
 
-1. **Landing Page** - Learn about features and click "Start Chatting"
-2. **Chat Interface** - Ask questions or use quick action buttons
-3. **Upload Files** - Upload plant images or soil report PDFs
-4. **Get Recommendations** - Follow the conversation flow for crop advice
+tests are in `src/lib/*.test.ts` and run with node's own test runner (node 23+).
 
-## 🌟 Key Capabilities
+## how its made
 
-- **15 Plant Diseases** with detailed treatment plans
-- **14 Crops** across all seasons (Kharif, Rabi, Zaid)
-- **Micronutrient Analysis** (NPK, Zinc, Boron, Sulfur, Iron)
-- **Cost Breakdowns** for fertilizers and treatments
-- **ROI Calculations** for crop profitability
-- **PDF Support** for soil test reports (up to 10MB)
+- next.js + react + tailwind
+- `src/lib/reply.ts` - decides what the bot says
+- `src/lib/symptoms.ts` - symptom checker
+- `src/lib/soil.ts` - reads soil values and gives advice (normal soil health card limits)
+- `src/lib/weather.ts` - open-meteo forecast + farm tips
+- `src/lib/prices.ts` + `src/app/api/prices` - mandi prices
+- `src/app/api/soil` - reads text out of the pdf
 
+## todo
 
+- photo diagnosis with a real trained model (like a plantvillage model)
+- malayalam / hindi / tamil
+- voice input for people who cant type easily
