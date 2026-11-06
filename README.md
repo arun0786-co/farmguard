@@ -44,7 +44,7 @@ npm test
 
 tests are in `src/lib/*.test.ts` and run with node's own test runner (node 23+).
 
-## how its made
+## how its made : 
 
 - next.js + react + tailwind
 - `src/lib/reply.ts` - decides what the bot says
