@@ -59,3 +59,4 @@ tests are in `src/lib/*.test.ts` and run with node's own test runner (node 23+).
 - photo diagnosis with a real trained model (like a plantvillage model)
 - malayalam / hindi / tamil
 - voice input for people who cant type easily
+- <3 :)
